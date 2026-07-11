@@ -1,63 +1,34 @@
 pipeline {
     agent { label 'linux-agent' }
- tools {
+
+    tools {
         maven 'Maven' 
     }
 
     stages {
         stage('Checkout') {
             steps {
+                cleanWs() // Clear old data to prevent conflict
                 checkout scm
             }
         }
 
-        stage('Parallel Code Validation') {
-            parallel {
-                stage('Unit Tests') {
-                    steps {
-                        echo 'Running automated JUnit test suites...'
-                        // Looks for pom.xml in the exact root folder
-                        sh 'mvn -f ./pom.xml test'
-                    }
-                }
-
-                stage('Static Code Analysis') {
-                    steps {
-                        echo 'Checking source code quality and styling...'
-                        // Looks for pom.xml in the exact root folder
-                        sh 'mvn -f ./pom.xml compile' 
-                    }
-                }
-
-                stage('Security Scan') {
-                    steps {
-                        echo 'Scanning dependencies for known security vulnerabilities...'
-                        sh 'echo "Security verification passed."'
-                    }
-                }
-            }
-        }
-
-        stage('Package Project') {
+        stage('Build & Test') {
             steps {
-                echo 'Packaging application into an executable JAR binary...'
-                // Packages the root project
-                sh 'mvn -f ./pom.xml package -DskipTests'
+                echo 'Compiling code and running JUnit verification tests...'
+                sh 'mvn clean package'
             }
         }
     }
     
     post {
         success {
-            // Saves the executable JAR directly from the root target folder
             archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-            echo 'Build successful! Your executable JAR is available in the Build Artifacts section.'
-        }
-        failure {
-            echo 'Pipeline failed during execution. Please review the parallel branch console logs.'
+            echo 'Success! Your executable file is ready under Build Artifacts.'
         }
         always {
-            cleanWs()
+            cleanWs() // Keeps your server disk space clean
         }
     }
 }
+
