@@ -1,6 +1,5 @@
 pipeline {
     agent { label 'linux-agent' }
-
     tools {
         maven 'Maven' 
     }
@@ -8,7 +7,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                cleanWs() // Clear old data to prevent conflict
+                cleanWs() 
                 checkout scm
             }
         }
@@ -22,13 +21,16 @@ pipeline {
     }
     
     post {
+        // SUCCESS runs first, saving your file safely
         success {
             archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             echo 'Success! Your executable file is ready under Build Artifacts.'
         }
+        // ALWAYS runs dead last, cleaning up the disk space afterwards
         always {
-            cleanWs() // Keeps your server disk space clean
+            cleanWs() 
         }
     }
 }
+
 
