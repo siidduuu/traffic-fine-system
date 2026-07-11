@@ -1,5 +1,6 @@
 pipeline {
-    agent { label 'linux-agent' }
+    agent any
+
     tools {
         maven 'Maven' 
     }
@@ -7,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                cleanWs() 
+                cleanWs() // Cleans the workspace safely BEFORE the build starts
                 checkout scm
             }
         }
@@ -21,16 +22,10 @@ pipeline {
     }
     
     post {
-        // SUCCESS runs first, saving your file safely
         success {
+            // Saves your file directly to the Jenkins UI dashboard
             archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             echo 'Success! Your executable file is ready under Build Artifacts.'
         }
-        // ALWAYS runs dead last, cleaning up the disk space afterwards
-        always {
-            cleanWs() 
-        }
     }
 }
-
-
