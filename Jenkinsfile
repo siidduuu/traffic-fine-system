@@ -1,7 +1,6 @@
 pipeline {
     agent { label 'linux-agent' }
-
-    tools {
+ tools {
         maven 'Maven' 
     }
 
@@ -17,16 +16,16 @@ pipeline {
                 stage('Unit Tests') {
                     steps {
                         echo 'Running automated JUnit test suites...'
-                        // Added -f flag to point to your subfolder
-                        sh 'mvn -f traffic-fine-system/pom.xml test'
+                        // Looks for pom.xml in the exact root folder
+                        sh 'mvn -f ./pom.xml test'
                     }
                 }
 
                 stage('Static Code Analysis') {
                     steps {
                         echo 'Checking source code quality and styling...'
-                        // Added -f flag to point to your subfolder
-                        sh 'mvn -f traffic-fine-system/pom.xml compile' 
+                        // Looks for pom.xml in the exact root folder
+                        sh 'mvn -f ./pom.xml compile' 
                     }
                 }
 
@@ -42,16 +41,16 @@ pipeline {
         stage('Package Project') {
             steps {
                 echo 'Packaging application into an executable JAR binary...'
-                // Added -f flag to point to your subfolder
-                sh 'mvn -f traffic-fine-system/pom.xml package -DskipTests'
+                // Packages the root project
+                sh 'mvn -f ./pom.xml package -DskipTests'
             }
         }
     }
     
     post {
         success {
-            // Updated artifact archiving path to find the JAR inside your subfolder target
-            archiveArtifacts artifacts: 'traffic-fine-system/target/*.jar', fingerprint: true
+            // Saves the executable JAR directly from the root target folder
+            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             echo 'Build successful! Your executable JAR is available in the Build Artifacts section.'
         }
         failure {
