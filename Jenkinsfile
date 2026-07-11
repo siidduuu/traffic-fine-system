@@ -1,11 +1,8 @@
 pipeline {
-   agent { label 'linux-agent' }
-    options {
-        timestamps()
-    }
+    agent { label 'linux-agent' }
+
     tools {
-      
-        maven 'Maven'  
+        maven 'Maven' 
     }
 
     stages {
@@ -20,22 +17,22 @@ pipeline {
                 stage('Unit Tests') {
                     steps {
                         echo 'Running automated JUnit test suites...'
-                        sh 'mvn test'
+                        // Added -f flag to point to your subfolder
+                        sh 'mvn -f traffic-fine-system/pom.xml test'
                     }
                 }
 
                 stage('Static Code Analysis') {
                     steps {
                         echo 'Checking source code quality and styling...'
-                        // Compiles code without running tests to analyze bytecode
-                        sh 'mvn compile' 
+                        // Added -f flag to point to your subfolder
+                        sh 'mvn -f traffic-fine-system/pom.xml compile' 
                     }
                 }
 
                 stage('Security Scan') {
                     steps {
                         echo 'Scanning dependencies for known security vulnerabilities...'
-                        // Simulates a quick dependency vulnerability check
                         sh 'echo "Security verification passed."'
                     }
                 }
@@ -45,16 +42,16 @@ pipeline {
         stage('Package Project') {
             steps {
                 echo 'Packaging application into an executable JAR binary...'
-                // Skips tests since they were safely validated in parallel above
-                sh 'mvn package -DskipTests'
+                // Added -f flag to point to your subfolder
+                sh 'mvn -f traffic-fine-system/pom.xml package -DskipTests'
             }
         }
     }
     
     post {
         success {
-            // Archives your compiled JAR artifact right to the Jenkins UI dashboard
-            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            // Updated artifact archiving path to find the JAR inside your subfolder target
+            archiveArtifacts artifacts: 'traffic-fine-system/target/*.jar', fingerprint: true
             echo 'Build successful! Your executable JAR is available in the Build Artifacts section.'
         }
         failure {
@@ -65,4 +62,3 @@ pipeline {
         }
     }
 }
-
