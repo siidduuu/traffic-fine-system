@@ -1,9 +1,11 @@
 pipeline {
-    agent any
-
+   agent { label 'linux-agent' }
+    options {
+        timestamps()
+    }
     tools {
-        // Injects Maven if configured under Jenkins Global Tool Configuration
-        maven 'Maven 3.x' 
+      
+        maven 'Maven' 
     }
 
     stages {
