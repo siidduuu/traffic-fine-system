@@ -21,11 +21,12 @@ pipeline {
         }
     }
     
-    post {
+      post {
         success {
-            // Saves your file directly to the Jenkins UI dashboard
-            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            // Make sure target/ traffic-*.jar has NO spaces inside the quotes
+            archiveArtifacts artifacts: 'target/traffic-*.jar', fingerprint: true
             echo 'Success! Your executable file is ready under Build Artifacts.'
         }
     }
+
 }
